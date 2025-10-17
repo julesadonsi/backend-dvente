@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title th:text="'Code de vérification - ' + ${appName}">Code de vérification</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fb;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 520px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            padding: 30px 40px;
+        }
+        .header {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .header h1 {
+            color: #0d8abc;
+            margin: 0;
+            font-size: 24px;
+        }
+        .content {
+            text-align: center;
+            margin-top: 25px;
+        }
+        .code {
+            display: inline-block;
+            background-color: #0d8abc;
+            color: white;
+            font-weight: bold;
+            font-size: 24px;
+            letter-spacing: 4px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .text {
+            color: #444;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 13px;
+            color: #888;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+        a.button {
+            display: inline-block;
+            background-color: #0d8abc;
+            color: white !important;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1 th:text="${appName}">Application</h1>
+    </div>
+
+    <div class="content">
+        <p class="text">Bonjour,</p>
+        <p class="text">
+            Voici votre code de vérification pour réinitialiser votre mot de passe sur
+            <strong th:text="${appName}">l'application</strong>.
+        </p>
+        <div class="code" th:text="${code}"></div>
+        <p class="text">
+            Ce code expirera dans
+            <strong th:text="${expirationMinutes} + ' minutes'">15 minutes</strong>.
+        </p>
+        <p class="text">
+            Vous pouvez également accéder à la page de réinitialisation via le lien ci-dessous :
+        </p>
+        <a class="button" th:href="${appUrl}" target="_blank">Réinitialiser le mot de passe</a>
+        <p class="text" style="margin-top: 20px;">
+            Si vous n’avez pas demandé cette réinitialisation, ignorez simplement cet email.
+        </p>
+    </div>
+    <div class="footer">
+        © <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}"></span>
+        <span th:text="${appName}">App</span> — Tous droits réservés.
+    </div>
+</div>
+</body>
+</html>
