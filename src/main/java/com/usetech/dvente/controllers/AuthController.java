@@ -25,16 +25,17 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequiredArgsConstructor
@@ -212,6 +213,23 @@ public class AuthController {
     @Operation(summary = "Google OAuth2 Login", description = "Redirection vers Google pour l'authentification")
     public RedirectView googleLogin() {
         return new RedirectView("/oauth2/authorization/google");
+    }
+
+
+    @GetMapping("/avatar-proxy")
+    public ResponseEntity<byte[]> proxyAvatar(@RequestParam String url) {
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<byte[]> response = restTemplate.getForEntity(url, byte[].class);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.IMAGE_JPEG);
+            headers.setCacheControl(CacheControl.maxAge(7, TimeUnit.DAYS));
+
+            return new ResponseEntity<>(response.getBody(), headers, HttpStatus.OK);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
 

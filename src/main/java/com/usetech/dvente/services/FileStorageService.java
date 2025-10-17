@@ -2,13 +2,11 @@ package com.usetech.dvente.services;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
 import java.util.UUID;
 
 @Service
@@ -115,5 +113,35 @@ public class FileStorageService {
 
         Path filePath = Paths.get(uploadBasePath, relativePath);
         return Files.exists(filePath);
+    }
+
+
+    public String saveAvatarFromUrl(String imageUrl, UUID userId) {
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            byte[] imageBytes = restTemplate.getForObject(imageUrl, byte[].class);
+
+            if (imageBytes == null || imageBytes.length == 0) {
+                return null;
+            }
+
+            String fileDir = uploadBasePath + "/avatars";
+            Path uploadPath = Paths.get(fileDir);
+
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            String filename = "user_" + userId + "_" + UUID.randomUUID().toString() + ".jpg";
+            Path filePath = uploadPath.resolve(filename);
+
+            Files.write(filePath, imageBytes, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+
+            return "/uploads/avatars/" + filename;
+
+        } catch (Exception e) {
+            System.err.println("Erreur lors du téléchargement de l'avatar: " + e.getMessage());
+            return null;
+        }
     }
 }
