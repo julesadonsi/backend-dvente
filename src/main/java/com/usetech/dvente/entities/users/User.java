@@ -8,6 +8,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -71,6 +72,7 @@ public class User extends BaseModel implements UserDetails {
     private String googleId;
 
     @Column(nullable = true)
+    @Builder.Default
     private String provider = "GOOGLE";
 
     public String getAvatarUrl() {
@@ -123,4 +125,7 @@ public class User extends BaseModel implements UserDetails {
     public boolean isEnabled() {
         return isActive;
     }
+
+
+
 }

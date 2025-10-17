@@ -29,6 +29,6 @@ public class ProductView extends BaseModel {
 
     @Override
     public String toString() {
-        return product.getTitle();
+        return product.getName();
     }
 }

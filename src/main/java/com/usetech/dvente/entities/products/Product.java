@@ -4,91 +4,54 @@ import com.usetech.dvente.entities.BaseModel;
 import com.usetech.dvente.entities.users.Shop;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Product extends BaseModel {
 
     @Column(nullable = false)
-    private String title;
+    private String name;
 
-    @Column(length = 500)
-    private String shortDescription;
-
-    @Column(columnDefinition = "TEXT", nullable = false)
+    @Column(columnDefinition = "TEXT")
     private String description;
-
-    private String state; // Enum possible
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
 
-    @Column(precision = 10, scale = 2)
-    private BigDecimal pricePromo;
+    @Column(name = "discount_price", precision = 10, scale = 2)
+    private BigDecimal discountPrice;
 
-    private boolean isActive = true;
-
-    private boolean isPromo = false;
-
+    @Column(name = "primary_image")
     private String primaryImage;
 
-    private int likeCount = 0;
+    @Column(name = "is_active")
+    private Boolean isActive = true;
 
-    private int viewsCount = 0;
+    @Column(name = "stock_quantity")
+    private Integer stockQuantity = 0;
 
-    private Integer stockCount;
-
-    private Boolean inStock;
-
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @ManyToOne
-    @JoinColumn(name = "shop_author_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "shop_id")
     private Shop shopAuthor;
 
-    @ManyToMany
-    @JoinTable(
-            name = "product_keywords",
-            joinColumns = @JoinColumn(name = "product_id"),
-            inverseJoinColumns = @JoinColumn(name = "keyword_id")
-    )
-    private Set<Keyword> keywords = new HashSet<>();
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ProductImage> otherImages = new ArrayList<>();
 
-    @Column(length = 500)
-    private String slug;
-
-    @PrePersist
-    @PreUpdate
-    public void validateAndGenerateSlug() {
-        if (pricePromo != null && pricePromo.compareTo(price) > 0) {
-            throw new IllegalArgumentException("Le prix promo doit être ≤ au prix normal.");
-        }
-
-        this.slug = StringUtils.replace(title.toLowerCase().trim(), " ", "-");
-    }
-
-    public void like() {
-        this.likeCount += 1;
-    }
-
-    public void addView() {
-        this.viewsCount += 1;
-    }
-
-    @Override
-    public String toString() {
-        return title;
-    }
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ProductReview> reviews = new ArrayList<>();
 }
