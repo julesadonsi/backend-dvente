@@ -29,16 +29,31 @@ jobs:
           set -e
           mvn clean package -DskipTests
 
-      # 🔍 4. Vérification du dossier target/
-      - name: Check build output
-        run: |
-          ls -lah target
-          if [ ! -f target/*.jar ]; then
-            echo "❌ Aucun fichier JAR trouvé!"
-            exit 1
-          fi
 
-      # 📦 5. Copie du fichier .jar sur le VPS
+      - name: Backup current JAR on VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          timeout: 60s
+          script: |
+            cd /root/dvente-api
+            
+            if [ -f app.jar ]; then
+              echo "💾 Sauvegarde de l'ancienne version..."
+              TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+              cp app.jar "app.jar.backup_$TIMESTAMP"
+            
+              # Garder seulement les 5 dernières sauvegardes
+              ls -t app.jar.backup_* 2>/dev/null | tail -n +6 | xargs -r rm
+            
+              echo "✅ Sauvegarde créée: app.jar.backup_$TIMESTAMP"
+            else
+              echo "ℹ️ Aucune version précédente à sauvegarder (premier déploiement)"
+            fi
+
       - name: Copy JAR to VPS
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -51,7 +66,7 @@ jobs:
           strip_components: 1
           timeout: 300s
 
-      # 🚀 6. Déploiement sur le VPS
+      # 🚀 7. Déploiement sur le VPS
       - name: Deploy on VPS
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -67,23 +82,13 @@ jobs:
             echo "➡️ Déploiement en cours sur le VPS..."
             
             # Vérification que le fichier JAR existe
-            JAR_FILE=$(ls -1 *.jar 2>/dev/null | head -n 1)
+            JAR_FILE=$(ls -1 *.jar 2>/dev/null | grep -v backup | head -n 1)
             if [ -z "$JAR_FILE" ]; then
               echo "❌ Aucun fichier JAR trouvé dans /root/dvente-api"
               exit 1
             fi
             
             echo "📦 Fichier JAR détecté: $JAR_FILE"
-            
-            # Sauvegarde de l'ancienne version si elle existe
-            if [ -f app.jar ]; then
-              echo "💾 Sauvegarde de l'ancienne version..."
-              TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-              mv app.jar "app.jar.backup_$TIMESTAMP"
-            
-              # Garder seulement les 3 dernières sauvegardes
-              ls -t app.jar.backup_* 2>/dev/null | tail -n +4 | xargs -r rm
-            fi
             
             # Renommer le nouveau jar
             mv "$JAR_FILE" app.jar
@@ -103,15 +108,29 @@ jobs:
               echo "❌ Échec du démarrage du service!"
               echo "📋 Logs du service:"
               journalctl -u springboot-app -n 50 --no-pager
+            
+              # Rollback automatique si backup disponible
+              LATEST_BACKUP=$(ls -t app.jar.backup_* 2>/dev/null | head -n 1)
+              if [ -n "$LATEST_BACKUP" ]; then
+                echo "🔙 Rollback vers: $LATEST_BACKUP"
+                cp "$LATEST_BACKUP" app.jar
+                systemctl restart springboot-app
+                sleep 10
+                if systemctl is-active --quiet springboot-app; then
+                  echo "✅ Rollback réussi!"
+                else
+                  echo "❌ Le rollback a également échoué!"
+                fi
+              fi
               exit 1
             fi
 
-      # 🎉 7. Notification de succès
+      # 🎉 8. Notification de succès
       - name: Deployment successful
         if: success()
         run: echo "🎉 Déploiement réussi sur le VPS!"
 
-      # ⚠️ 8. Notification d'échec
+      # ⚠️ 9. Notification d'échec
       - name: Deployment failed
         if: failure()
         run: |
