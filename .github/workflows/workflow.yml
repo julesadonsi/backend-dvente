@@ -45,16 +45,6 @@ jobs:
           target: "/root/dvente-api"
           strip_components: 1
 
-      # ⚙️ 6. Copie du fichier .env sur le VPS
-      - name: Copy .env file to VPS
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT }}
-          source: ".env"
-          target: "/root/dvente-api"
 
       # 🚀 7. Déploiement et redémarrage du service sur le VPS
       - name: Deploy on VPS
