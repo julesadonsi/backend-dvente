@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="pagination(page, baseUrl, extraParams)" class="d-flex justify-content-between align-items-center">
+    <div>
+            <span class="text-muted">
+                Affichage de <strong th:text="${page.number * page.size + 1}">1</strong> à
+                <strong th:text="${page.number * page.size + page.numberOfElements}">10</strong>
+                sur <strong th:text="${page.totalElements}">100</strong> résultats
+            </span>
+    </div>
+
+    <nav th:if="${page.totalPages > 1}">
+        <ul class="pagination pagination-sm mb-0">
+            <!-- Previous -->
+            <li class="page-item" th:classappend="${page.first ? 'disabled' : ''}">
+                <a class="page-link"
+                   th:href="${page.first ? '#' : baseUrl + '?page=' + (page.number - 1) + '&size=' + page.size + (extraParams ?: '')}"
+                   th:onclick="${page.first ? 'return false;' : ''}">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>
+
+            <!-- Page Numbers -->
+            <li th:each="pageNum : ${#numbers.sequence(0, page.totalPages - 1)}"
+                th:if="${pageNum >= (page.number - 2) and pageNum <= (page.number + 2)}"
+                class="page-item"
+                th:classappend="${pageNum == page.number ? 'active' : ''}">
+                <a class="page-link"
+                   th:href="${baseUrl + '?page=' + pageNum + '&size=' + page.size + (extraParams ?: '')}"
+                   th:text="${pageNum + 1}">1</a>
+            </li>
+
+            <!-- Next -->
+            <li class="page-item" th:classappend="${page.last ? 'disabled' : ''}">
+                <a class="page-link"
+                   th:href="${page.last ? '#' : baseUrl + '?page=' + (page.number + 1) + '&size=' + page.size + (extraParams ?: '')}"
+                   th:onclick="${page.last ? 'return false;' : ''}">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
+</body>
+</html>

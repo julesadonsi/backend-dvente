@@ -4,6 +4,8 @@ package com.usetech.dvente.repositories.shops;
 import com.usetech.dvente.entities.users.Shop;
 import com.usetech.dvente.entities.users.ShopStatus;
 import com.usetech.dvente.entities.users.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,10 +18,15 @@ import java.util.UUID;
 @Repository
 public interface ShopRepository extends JpaRepository<Shop, UUID> {
 
+    long countByVisible(Boolean visible);
     /**
      * Trouve une boutique par son URL unique
      */
     Optional<Shop> findByShopUrl(String shopUrl);
+
+    Optional<Shop> findFirstByUser(User user);
+
+    Shop getShopByUser(User user);
 
     /**
      * Vérifie si une boutique existe avec cette URL
@@ -44,7 +51,8 @@ public interface ShopRepository extends JpaRepository<Shop, UUID> {
     /**
      * Trouve toutes les boutiques par statut
      */
-    List<Shop> findByStatus(ShopStatus status);
+    Page<Shop> findByStatus(ShopStatus status, Pageable pageable);
+
 
     /**
      * Trouve toutes les boutiques visibles avec un statut spécifique

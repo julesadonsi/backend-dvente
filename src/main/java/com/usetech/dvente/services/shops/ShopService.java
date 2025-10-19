@@ -7,16 +7,20 @@ import com.usetech.dvente.entities.users.User;
 import com.usetech.dvente.repositories.shops.ShopGalleryRepository;
 import com.usetech.dvente.repositories.shops.ShopRepository;
 import com.usetech.dvente.repositories.shops.ShopUrlHistoryRepository;
-import com.usetech.dvente.requests.shops.CreateMerchantRequest;
+import com.usetech.dvente.requests.shops.CreateShopRequest;
+import com.usetech.dvente.requests.shops.UpdateShopRequest;
 import com.usetech.dvente.responses.shops.ShopResponse;
 import com.usetech.dvente.services.FileStorageService;
 import com.usetech.dvente.services.notifs.EmailService;
+import com.usetech.dvente.utils.ShopUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,16 +55,11 @@ public class ShopService {
     public ShopResponse getShopById(UUID shopId) {
         Shop shop = shopRepository.findById(shopId)
                 .orElseThrow(() -> new RuntimeException("Shop not found"));
-
-        // Charger les galleries
         List<ShopGallery> galleries = shopGalleryRepository.findByShop_IdOrderByCreatedAtDesc(shopId);
-
-        // Charger le dernier changement d'URL
         ShopUrlHistory lastUrlChange = shopUrlHistoryRepository
                 .findFirstByShop_IdOrderByChangedAtDesc(shopId)
                 .orElse(null);
-
-        return ShopResponse.fromEntity(shop, apiUrl, galleries, lastUrlChange);
+        return ShopResponse.fromEntity(shop, galleries, lastUrlChange);
     }
 
     @Transactional(readOnly = true)
@@ -73,7 +72,7 @@ public class ShopService {
                     ShopUrlHistory lastUrlChange = shopUrlHistoryRepository
                             .findFirstByShopOrderByChangedAtDesc(shop)
                             .orElse(null);
-                    return ShopResponse.fromEntity(shop, apiUrl, galleries, lastUrlChange);
+                    return ShopResponse.fromEntity(shop, galleries, lastUrlChange);
                 })
                 .toList();
     }
@@ -87,7 +86,7 @@ public class ShopService {
     }
 
     @Transactional
-    public Shop createMerchant(CreateMerchantRequest request, User user) {
+    public Shop createMerchant(CreateShopRequest request, User user) {
         String ifuDocumentPath = fileStorageService.saveDocument(request.getIfuDocument(), "ifu");
         String rcmDocumentPath = fileStorageService.saveDocument(request.getRcmDocument(), "rcm");
 
@@ -140,4 +139,121 @@ public class ShopService {
                 variables
         );
     }
+
+    public Shop updateShop(UpdateShopRequest request, Shop shop) {
+        if (request.getShopName() != null && !request.getShopName().isBlank()) {
+            shop.setShopName(request.getShopName());
+        }
+
+        if (request.getDescription() != null) {
+            shop.setDescription(request.getDescription());
+        }
+
+        if (request.getShopUrl() != null && !request.getShopUrl().isBlank()) {
+            shop.setShopUrl(request.getShopUrl());
+        }
+
+        if (request.getEmail() != null && !request.getEmail().isBlank()) {
+            shop.setEmail(request.getEmail());
+        }
+
+        if (request.getAddress() != null && !request.getAddress().isBlank()) {
+            shop.setAddress(request.getAddress());
+        }
+
+        if (request.getWhatsappNumber() != null && !request.getWhatsappNumber().isBlank()) {
+            shop.setWhatsappNumber(request.getWhatsappNumber());
+        }
+
+        if (request.getNumeroIfu() != null && !request.getNumeroIfu().isBlank()) {
+            shop.setNumeroIfu(request.getNumeroIfu());
+        }
+
+        if (request.getNumRcm() != null && !request.getNumRcm().isBlank()) {
+            shop.setNumRcm(request.getNumRcm());
+        }
+
+        if (request.getCity() != null && !request.getCity().isBlank()) {
+            shop.setCity(request.getCity());
+        }
+
+        if (request.getCountry() != null && !request.getCountry().isBlank()) {
+            shop.setCountry(request.getCountry());
+        }
+
+        if (request.getDomaineActivity() != null && !request.getDomaineActivity().isBlank()) {
+            shop.setDomaineActivity(request.getDomaineActivity());
+        }
+
+        if (request.getRegimeFiscale() != null && !request.getRegimeFiscale().isBlank()) {
+            shop.setRegimeFiscale(request.getRegimeFiscale());
+        }
+
+        shop.setUpdatedAt(LocalDateTime.now());
+        return shopRepository.save(shop);
+    }
+
+    public void updateShopGalleries(Shop shop, List<MultipartFile> newImages, List<UUID> imagesToDelete) {
+        if (newImages != null && !newImages.isEmpty()) {
+            for (MultipartFile image : newImages) {
+                String imagePath = fileStorageService.saveDocument(image, "shop-galleries");
+
+                ShopGallery gallery = ShopGallery.builder()
+                        .shop(shop)
+                        .image(imagePath)
+                        .build();
+
+                shopGalleryRepository.save(gallery);
+            }
+        }
+        if (imagesToDelete != null && !imagesToDelete.isEmpty()) {
+            List<ShopGallery> galleriesToDelete = shopGalleryRepository.findAllById(imagesToDelete);
+            for (ShopGallery gallery : galleriesToDelete) {
+                if (gallery.getImage() != null && !gallery.getImage().isEmpty()) {
+                    fileStorageService.deleteDocument(gallery.getImage());
+                }
+            }
+            shopGalleryRepository.deleteAll(galleriesToDelete);
+        }
+
+        shopRepository.findById(shop.getId());
+    }
+
+
+    public Shop updateShopDocuments(Shop shop, MultipartFile ifuDocument, MultipartFile rcmDocument) {
+        boolean hasUpdates = false;
+
+        if (ifuDocument != null && !ifuDocument.isEmpty()) {
+            if (shop.getIfuDocument() != null && !shop.getIfuDocument().isEmpty()) {
+                fileStorageService.deleteDocument(shop.getIfuDocument());
+            }
+
+            String ifuPath = fileStorageService.saveDocument(ifuDocument, "ifu");
+            shop.setIfuDocument(ifuPath);
+            hasUpdates = true;
+        }
+        if (rcmDocument != null && !rcmDocument.isEmpty()) {
+            if (shop.getRcmDocument() != null && !shop.getRcmDocument().isEmpty()) {
+                fileStorageService.deleteDocument(shop.getRcmDocument());
+            }
+            String rcmPath = fileStorageService.saveDocument(rcmDocument, "rcm");
+            shop.setRcmDocument(rcmPath);
+            hasUpdates = true;
+        }
+
+        if (!hasUpdates) {
+            throw new IllegalArgumentException("Aucun document fourni");
+        }
+
+        shop.setUpdatedAt(java.time.LocalDateTime.now());
+        return shopRepository.save(shop);
+    }
+
+    @Transactional(readOnly = true)
+    public Shop getShopByShopUrl(String shopUrl) {
+        String cleanedUrl = ShopUtils.removeAtSymbol(shopUrl);
+        return shopRepository.findByShopUrl(cleanedUrl)
+                .orElse(null);
+    }
+
 }

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      th:replace="admin/layout :: layout(~{::title}, ~{::content})">
+<head>
+    <title>Liste des utilisateurs - Admin</title>
+</head>
+<body>
+<div th:fragment="content">
+    <!-- Tableau des utilisateurs -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">Liste des utilisateurs</h6>
+                    <span class="badge bg-secondary"
+                          th:text="${users.totalElements} + ' utilisateurs'">0 utilisateurs</span>
+                </div>
+
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover mb-0">
+                            <thead class="table-dark">
+                            <tr>
+                                <th>Avatar</th>
+                                <th>Nom</th>
+                                <th>Email</th>
+                                <th>Téléphone</th>
+                                <th>Rôle</th>
+                                <th>Statut</th>
+                                <th>Date de création</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:if="${users.content.empty}">
+                                <td colspan="8" class="text-center py-4 text-muted">
+                                    <i class="fas fa-user-slash fa-2x mb-2 d-block"></i>
+                                    Aucun utilisateur trouvé
+                                </td>
+                            </tr>
+
+                            <tr th:each="user : ${users.content}" th:if="${!users.content.empty}">
+                                <td>
+                                    <img th:if="${user.avatar != null and !user.avatar.isEmpty()}"
+                                         th:src="@{${user.avatar}}"
+                                         class="rounded-circle"
+                                         width="40" height="40"
+                                         th:alt="${user.name}">
+                                    <i th:unless="${user.avatar != null and !user.avatar.isEmpty()}"
+                                       class="fas fa-user-circle fa-2x text-muted"></i>
+                                </td>
+                                <td>
+                                    <strong th:text="${user.name}">John Doe</strong><br>
+                                    <small class="text-muted"
+                                           th:text="${user.city != null ? user.city : 'Non renseigné'}"></small>
+                                </td>
+                                <td>
+                                    <span th:text="${user.email}">john@example.com</span><br>
+                                    <span th:if="${user.emailConfirmed}" class="badge bg-success">
+                                        <i class="fas fa-check me-1"></i>Vérifié
+                                    </span>
+                                    <span th:unless="${user.emailConfirmed}" class="badge bg-warning">
+                                        <i class="fas fa-clock me-1"></i>Non vérifié
+                                    </span>
+                                </td>
+                                <td>
+                                    <span th:text="${user.phone != null ? user.phone : 'Non renseigné'}"
+                                          th:class="${user.phone != null ? '' : 'text-muted'}">
+                                          +33 6 00 00 00 00
+                                    </span><br>
+                                    <span th:if="${user.phone != null and user.phoneConfirmed}" class="badge bg-success">
+                                        <i class="fas fa-check me-1"></i>Vérifié
+                                    </span>
+                                    <span th:if="${user.phone != null and !user.phoneConfirmed}" class="badge bg-warning">
+                                        <i class="fas fa-clock me-1"></i>Non vérifié
+                                    </span>
+                                </td>
+                                <td>
+                                    <span th:switch="${user.role.name()}" class="badge">
+                                        <span th:case="'ADMIN'" class="badge bg-danger">
+                                            <i class="fas fa-crown me-1"></i>Admin
+                                        </span>
+                                        <span th:case="'SHOP'" class="badge bg-warning">
+                                            <i class="fas fa-store me-1"></i>Vendeur
+                                        </span>
+                                        <span th:case="'CLIENT'" class="badge bg-info">
+                                            <i class="fas fa-user me-1"></i>Client
+                                        </span>
+                                        <span th:case="'COMMERCIAL'" class="badge bg-primary">
+                                            <i class="fas fa-briefcase me-1"></i>Commercial
+                                        </span>
+                                        <span th:case="*" class="badge bg-secondary"
+                                              th:text="${user.role}"></span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span th:if="${user.active}" class="badge bg-success">
+                                        <i class="fas fa-check-circle me-1"></i>Actif
+                                    </span>
+                                    <span th:unless="${user.active}" class="badge bg-danger">
+                                        <i class="fas fa-times-circle me-1"></i>Inactif
+                                    </span>
+                                </td>
+                                <td th:text="${#temporals.format(user.createdAt, 'dd/MM/yyyy HH:mm')}">
+                                    01/01/2024 10:00
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a th:href="@{/admin/users/{id}(id=${user.id})}"
+                                           class="btn btn-outline-info" title="Voir détails">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <button type="button"
+                                                class="btn btn-outline-warning toggle-status-btn"
+                                                th:data-id="${user.id}"
+                                                th:data-current-status="${user.active}"
+                                                th:title="${user.active ? 'Désactiver' : 'Activer'}">
+                                            <i th:class="${user.active ? 'fas fa-user-times' : 'fas fa-user-check'}"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div class="card-footer" th:if="${users.totalPages > 1}">
+                    <nav>
+                        <ul class="pagination pagination-sm justify-content-center mb-0">
+                            <li class="page-item" th:classappend="${users.first ? 'disabled' : ''}">
+                                <a class="page-link"
+                                   th:href="@{/admin/users(page=${users.number - 1}, size=${pageSize})}">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            </li>
+
+                            <li th:each="page : ${#numbers.sequence(0, users.totalPages - 1)}"
+                                class="page-item"
+                                th:classappend="${page == users.number ? 'active' : ''}">
+                                <a class="page-link"
+                                   th:href="@{/admin/users(page=${page}, size=${pageSize})}"
+                                   th:text="${page + 1}">1</a>
+                            </li>
+
+                            <li class="page-item" th:classappend="${users.last ? 'disabled' : ''}">
+                                <a class="page-link"
+                                   th:href="@{/admin/users(page=${users.number + 1}, size=${pageSize})}">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JS pour activer/désactiver un utilisateur -->
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.toggle-status-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const userId = this.dataset.id;
+                const currentStatus = this.dataset.currentStatus === 'true';
+
+                if (confirm(`Voulez-vous ${currentStatus ? 'désactiver' : 'activer'} cet utilisateur ?`)) {
+                    fetch(`/admin/users/${userId}/toggle-status`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) location.reload();
+                            else alert('Erreur : ' + data.message);
+                        })
+                        .catch(err => {
+                            console.error('Erreur:', err);
+                            alert('Une erreur est survenue.');
+                        });
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

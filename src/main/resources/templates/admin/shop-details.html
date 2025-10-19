@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      th:replace="admin/layout :: layout(~{::title}, ~{::content})">
+<head>
+    <title th:text="${pageTitle}">Détails boutique</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="m-0 font-weight-bold text-primary" th:text="${shop.shopName}">Nom boutique</h6>
+                    <span class="badge bg-secondary" th:text="${shop.status.label}">Statut</span>
+                </div>
+                <div class="card-body">
+                    <p><strong>ID :</strong> <span th:text="${shop.id}">UUID</span></p>
+                    <p><strong>Propriétaire :</strong> <span th:text="${shop.owner.name}">John Doe</span></p>
+                    <p><strong>Email :</strong> <span th:text="${shop.owner.email}">john@example.com</span></p>
+                    <p><strong>Téléphone :</strong> <span th:text="${shop.owner.phone}">+33 6 00 00 00 00</span></p>
+                    <p><strong>Date création :</strong>
+                        <span th:text="${#temporals.format(shop.createdAt, 'dd/MM/yyyy HH:mm')}">01/01/2024 10:00</span>
+                    </p>
+                    <p><strong>Visibilité :</strong>
+                        <span th:text="${shop.visible ? 'Visible' : 'Cachée'}">Visible</span>
+                    </p>
+                    <p><strong>Description :</strong></p>
+                    <p th:text="${shop.description != null ? shop.description : 'Aucune description'}">Lorem ipsum...</p>
+                </div>
+                <div class="card-footer">
+                    <a th:href="@{/admin/shops}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Retour à la liste
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

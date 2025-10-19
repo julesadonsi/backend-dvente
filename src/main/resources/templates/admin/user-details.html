@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      th:replace="admin/layout :: layout(~{::title}, ~{::content})">
+<head>
+    <title th:text="${pageTitle}">Détails utilisateur</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="m-0 font-weight-bold text-primary" th:text="${user.name}">Nom utilisateur</h6>
+                    <span class="badge bg-info" th:text="${user.role.name()}">Rôle</span>
+                    <span th:if="${user.active}" class="badge bg-success">Actif</span>
+                    <span th:unless="${user.active}" class="badge bg-danger">Inactif</span>
+                </div>
+                <div class="card-body">
+                    <p><strong>ID :</strong> <span th:text="${user.id}">UUID</span></p>
+                    <p><strong>Email :</strong> <span th:text="${user.email}">john@example.com</span></p>
+                    <p><strong>Téléphone :</strong> <span th:text="${user.phone != null ? user.phone : 'Non renseigné'}">+33 6 00 00 00 00</span></p>
+                    <p><strong>Date création :</strong>
+                        <span th:text="${#temporals.format(user.createdAt, 'dd/MM/yyyy HH:mm')}">01/01/2024 10:00</span>
+                    </p>
+                    <p><strong>Adresse :</strong> <span th:text="${user.city != null ? user.city : 'Non renseigné'}">Paris</span></p>
+                    <p><strong>Avatar :</strong></p>
+                    <img th:if="${user.avatar != null and !user.avatar.isEmpty()}"
+                         th:src="@{${user.avatar}}"
+                         class="rounded-circle"
+                         width="80" height="80"
+                         th:alt="${user.name}">
+                    <i th:unless="${user.avatar != null and !user.avatar.isEmpty()}" class="fas fa-user-circle fa-4x text-muted"></i>
+                </div>
+                <div class="card-footer">
+                    <a th:href="@{/admin/users}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Retour à la liste
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -126,10 +126,8 @@ public class AuthController {
         }
 
         try {
-            // Créer la vérification
             EmailVerification verification = verificationService.createVerification(email);
 
-            // Envoyer l'email
             boolean emailSent = emailService.sendVerificationCode(email, verification.getCode());
 
             if (emailSent) {

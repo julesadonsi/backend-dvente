@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateMerchantRequest {
+public class CreateShopRequest {
 
     @NotBlank(message = "Le nom de la boutique est requis")
     @Size(max = 255, message = "Le nom de la boutique ne doit pas dépasser 255 caractères")
@@ -50,7 +50,6 @@ public class CreateMerchantRequest {
     @NotBlank(message = "Le domaine d'activité est requis")
     private String domaineActivity;
 
-    @NotBlank(message = "Le régime fiscal est requis")
     private String regimeFiscale;
 
     @NotNull(message = "Le document IFU est requis")
