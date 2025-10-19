@@ -14,4 +14,7 @@ public interface ShopGalleryRepository extends JpaRepository<ShopGallery, UUID> 
     List<ShopGallery> findByShopOrderByCreatedAtDesc(Shop shop);
 
     List<ShopGallery> findByShop_IdOrderByCreatedAtDesc(UUID shopId);
+
+    List<ShopGallery> findByShopIdOrderByCreatedAtDesc(UUID shopId);
+
 }

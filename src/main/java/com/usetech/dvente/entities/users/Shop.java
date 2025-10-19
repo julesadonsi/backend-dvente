@@ -70,7 +70,7 @@ public class Shop extends BaseModel {
     private List<ShopView> views;
 
     @OneToMany(mappedBy = "shop", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ShopGallery> galleries;
+    private List<ShopGallery> gallery;
 
     @OneToMany(mappedBy = "shop", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PaymentProvider> paymentProviders;

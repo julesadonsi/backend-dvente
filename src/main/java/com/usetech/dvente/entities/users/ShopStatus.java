@@ -5,10 +5,11 @@ import lombok.Getter;
 @Getter
 public enum ShopStatus {
     ACTIF("Actif"),
-    INACTIF("Inactif"),
-    BANNED("Banni"),
+    SUSPENDED("Suspendu"),
     REFUSED("Refusé"),
-    WAITING("En attente de validation");
+    WAITING("En attente de validation"),
+    INACTIF("Inactif"),
+    BANNED("Banni");
 
     private final String label;
 

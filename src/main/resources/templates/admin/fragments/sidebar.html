@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle != null ? pageTitle + ' - ' : ''}">Administration Dvente</title>
+
+    <!-- Bootstrap CSS -->
+    <link th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .sidebar { min-height: 100vh; background: #343a40; }
+        .sidebar .nav-link { color: #adb5bd; padding: 0.75rem 1rem; }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active { color: #fff; background-color: #495057; }
+        .main-content { background-color: #f8f9fa; min-height: 100vh; }
+        .navbar-brand { font-weight: bold; }
+        .card { box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); border: 1px solid rgba(0, 0, 0, 0.125); }
+        .stat-card { transition: transform 0.2s; }
+        .stat-card:hover { transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav class="col-md-2 d-none d-md-block sidebar">
+            <div class="position-sticky pt-3">
+                <div class="text-center py-3">
+                    <h4 class="text-white">Admin Panel</h4>
+                    <small class="text-muted">Dvente</small>
+                </div>
+
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/admin/dashboard}" th:classappend="${#httpServletRequest.requestURI == '/admin/dashboard' ? 'active' : ''}">
+                            <i class="fas fa-tachometer-alt me-2"></i>
+                            Tableau de bord
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/admin/users}" th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/admin/users') ? 'active' : ''}">
+                            <i class="fas fa-users me-2"></i>
+                            Utilisateurs
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/admin/shops}" th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/admin/shops') ? 'active' : ''}">
+                            <i class="fas fa-store me-2"></i>
+                            Boutiques
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/admin/settings}" th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/admin/settings') ? 'active' : ''}">
+                            <i class="fas fa-cog me-2"></i>
+                            Paramètres
+                        </a>
+                    </li>
+                    <li class="nav-item mt-4">
+                        <a class="nav-link text-danger" th:href="@{/admin/logout}">
+                            <i class="fas fa-sign-out-alt me-2"></i>
+                            Déconnexion
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="col-md-10 ms-sm-auto main-content">
+            <!-- Top Navigation -->
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom bg-white px-3 shadow-sm">
+                <h1 class="h2" th:text="${pageTitle ?: 'Administration'}">Administration</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <div class="btn-group me-2">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="location.reload()">
+                            <i class="fas fa-sync-alt"></i> Actualiser
+                        </button>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle"></i> <span sec:authentication="name">Admin</span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" th:href="@{/admin/settings}">Paramètres</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" th:href="@{/admin/logout}">Déconnexion</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page Content -->
+            <div class="px-3 py-2">
+                <div th:replace="${content}"></div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+
+<script>
+    // Auto-refresh pour certaines données
+    function autoRefresh() {
+        if (window.location.pathname === '/admin/dashboard') {
+            setTimeout(() => location.reload(), 300000); // 5 minutes
+        }
+    }
+    autoRefresh();
+</script>
+</body>
+</html>

@@ -13,7 +13,7 @@ import lombok.*;
 public class ShopGallery extends BaseModel {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "shopId")
+    @JoinColumn(name = "shop_id")
     private Shop shop;
 
     private String image;

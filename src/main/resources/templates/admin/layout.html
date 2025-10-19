@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr" th:fragment="layout (title, content)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:replace="${title}">Admin Dashboard</title>
+    <link href="/webjars/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        .sidebar {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 100;
+            padding: 48px 0 0;
+            box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+        }
+
+        .sidebar-sticky {
+            position: relative;
+            top: 0;
+            height: calc(100vh - 48px);
+            padding-top: .5rem;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        .main-content {
+            margin-left: 240px;
+            padding: 20px;
+        }
+
+        @media (max-width: 767.98px) {
+            .sidebar {
+                top: 5rem;
+            }
+            .main-content {
+                margin-left: 0;
+            }
+        }
+
+        .stat-card {
+            border-left: 0.25rem solid #e3e6f0 !important;
+        }
+
+        .border-left-primary {
+            border-left-color: #4e73df !important;
+        }
+
+        .border-left-success {
+            border-left-color: #1cc88a !important;
+        }
+
+        .border-left-info {
+            border-left-color: #36b9cc !important;
+        }
+
+        .border-left-warning {
+            border-left-color: #f6c23e !important;
+        }
+
+        .text-gray-800 {
+            color: #5a5c69 !important;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header Navigation -->
+<nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+    <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="#" th:href="@{/admin/dashboard}">
+        <i class="fas fa-tachometer-alt me-2"></i>Admin Panel
+    </a>
+
+    <button class="navbar-toggler position-absolute d-md-none collapsed" type="button"
+            data-bs-toggle="collapse" data-bs-target="#sidebarMenu">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="navbar-nav">
+        <div class="nav-item text-nowrap">
+            <a class="nav-link px-3" href="#" th:href="@{/admin/logout}">
+                <i class="fas fa-sign-out-alt me-1"></i>Se déconnecter
+            </a>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+
+        <!-- Sidebar -->
+        <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+            <div class="position-sticky pt-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           th:classappend="${#httpServletRequest.requestURI == '/admin/dashboard' || #httpServletRequest.requestURI == '/admin/' ? 'active' : ''}"
+                           th:href="@{/admin/dashboard}">
+                            <i class="fas fa-home me-2"></i>Tableau de bord
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/admin/users') ? 'active' : ''}"
+                           th:href="@{/admin/users}">
+                            <i class="fas fa-users me-2"></i>Utilisateurs
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/admin/shops') ? 'active' : ''}"
+                           th:href="@{/admin/shops}">
+                            <i class="fas fa-store me-2"></i>Boutiques
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/admin/settings') ? 'active' : ''}"
+                           th:href="@{/admin/settings}">
+                            <i class="fas fa-cog me-2"></i>Paramètres
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+
+            <!-- Page Header -->
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2" th:text="${pageTitle} ?: 'Page'">Page Title</h1>
+            </div>
+
+            <!-- Messages d'alerte -->
+            <div th:if="${message}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <span th:text="${message}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Content block for child templates -->
+            <div th:replace="${content}">
+                <!-- Contenu principal de la page -->
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<script src="/webjars/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+<script src="/webjars/jquery/3.7.1/jquery.min.js"></script>
+
+</body>
+</html>

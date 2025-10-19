@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      th:replace="admin/layout :: layout(~{::title}, ~{::content})">
+<head>
+    <title>Tableau de bord - Admin</title>
+</head>
+<body>
+<div th:fragment="content">
+    <!-- Statistiques -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-card border-left-primary h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Utilisateurs totaux
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${totalUsers}">0</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-card border-left-success h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Boutiques actives
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${activeShops}">0</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-store fa-2x text-success"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-card border-left-info h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Total boutiques
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${totalShops}">0</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-shopping-cart fa-2x text-info"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-card border-left-warning h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Taux d'activation
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                <span th:text="${totalShops > 0 ? #numbers.formatDecimal(activeShops * 100.0 / totalShops, 1, 1) : '0'}">0</span>%
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-chart-pie fa-2x text-warning"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions rapides -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="m-0 font-weight-bold text-primary">Actions rapides</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a th:href="@{/admin/users}" class="btn btn-outline-primary btn-sm w-100">
+                                <i class="fas fa-users me-2"></i>
+                                Gérer les utilisateurs
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a th:href="@{/admin/shops}" class="btn btn-outline-success btn-sm w-100">
+                                <i class="fas fa-store me-2"></i>
+                                Gérer les boutiques
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a th:href="@{/admin/settings}" class="btn btn-outline-info btn-sm w-100">
+                                <i class="fas fa-cog me-2"></i>
+                                Paramètres système
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <button class="btn btn-outline-secondary btn-sm w-100" onclick="location.reload()">
+                                <i class="fas fa-sync-alt me-2"></i>
+                                Actualiser
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

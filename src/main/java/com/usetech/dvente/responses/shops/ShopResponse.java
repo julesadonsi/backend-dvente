@@ -1,6 +1,8 @@
 package com.usetech.dvente.responses.shops;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.usetech.dvente.configs.ApiConfig;
 import com.usetech.dvente.entities.users.Shop;
 import com.usetech.dvente.entities.users.ShopGallery;
 import com.usetech.dvente.entities.users.ShopUrlHistory;
@@ -8,6 +10,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -19,8 +23,17 @@ import java.util.stream.Collectors;
 @Data
 @Builder
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@Component
 @AllArgsConstructor
 public class ShopResponse {
+
+    private static ApiConfig apiConfig;
+
+    @Autowired
+    public void setApiConfig(ApiConfig apiConfig) {
+        ShopResponse.apiConfig = apiConfig;
+    }
 
     private UUID id;
 
@@ -64,6 +77,7 @@ public class ShopResponse {
     @JsonProperty("can_change_shop_url")
     private Boolean canChangeShopUrl;
 
+    @JsonProperty("gallery")
     private List<ShopGalleryResponse> gallery;
 
     @JsonProperty("ifu_document")
@@ -78,14 +92,13 @@ public class ShopResponse {
     @JsonProperty("updated_at")
     private String updatedAt;
 
-    public static ShopResponse fromEntity(Shop shop, String apiUrl) {
-        return fromEntity(shop, apiUrl, null, null);
+    public static ShopResponse fromEntity(Shop shop) {
+        return fromEntity(shop, null, null);
     }
 
     public static ShopResponse fromEntity(
             Shop shop,
-            String apiUrl,
-            List<ShopGallery> galleries,
+            List<ShopGallery> gallery,
             ShopUrlHistory lastUrlChange
     ) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
@@ -106,20 +119,19 @@ public class ShopResponse {
                 .numRcm(shop.getNumRcm())
                 .status(shop.getStatus() != null ? shop.getStatus().name() : null)
                 .visible(shop.isVisible())
-                // Champs calculés
-                .logo(buildLogoUrl(shop, apiUrl))
+                .logo(buildLogoUrl(shop))
                 .canChangeShopUrl(calculateCanChangeShopUrl(lastUrlChange))
-                .gallery(buildGallery(galleries, apiUrl))
-                .ifuDocument(buildDocumentUrl(shop.getIfuDocument(), apiUrl))
-                .rcmDocument(buildDocumentUrl(shop.getRcmDocument(), apiUrl))
+                .gallery(buildGallery(gallery))
+                .ifuDocument(buildDocumentUrl(shop.getIfuDocument()))
+                .rcmDocument(buildDocumentUrl(shop.getRcmDocument()))
                 .createdAt(shop.getCreatedAt() != null ? shop.getCreatedAt().format(formatter) : null)
                 .updatedAt(shop.getUpdatedAt() != null ? shop.getUpdatedAt().format(formatter) : null)
                 .build();
     }
 
-    private static String buildLogoUrl(Shop shop, String apiUrl) {
+    private static String buildLogoUrl(Shop shop) {
         if (shop.getLogo() != null && !shop.getLogo().isEmpty()) {
-            return apiUrl + shop.getLogo();
+            return apiConfig.getApiUrl() + shop.getLogo();
         }
 
         String shopName = shop.getNameOfShop() != null ? shop.getNameOfShop() : "Shop";
@@ -138,19 +150,19 @@ public class ShopResponse {
         return daysSinceLastChange >= 30;
     }
 
-    private static List<ShopGalleryResponse> buildGallery(List<ShopGallery> galleries, String apiUrl) {
+    private static List<ShopGalleryResponse> buildGallery(List<ShopGallery> galleries) {
         if (galleries == null || galleries.isEmpty()) {
             return List.of();
         }
 
         return galleries.stream()
-                .map(gallery -> ShopGalleryResponse.fromEntity(gallery, apiUrl))
+                .map(ShopGalleryResponse::fromEntity)
                 .collect(Collectors.toList());
     }
 
-    private static String buildDocumentUrl(String document, String apiUrl) {
+    private static String buildDocumentUrl(String document) {
         if (document != null && !document.isEmpty()) {
-            return apiUrl + document;
+            return apiConfig.getApiUrl() + document;
         }
         return null;
     }

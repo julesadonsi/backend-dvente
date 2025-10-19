@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" th:replace="admin/layout :: layout(~{::title}, ~{::content})">
+<head>
+    <title>Paramètres système - Admin</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="row">
+        <!-- Paramètres généraux -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-cogs me-2"></i>Paramètres généraux
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form id="generalSettingsForm">
+                        <div class="mb-3">
+                            <label for="platformName" class="form-label">Nom de la plateforme</label>
+                            <input type="text" class="form-control" id="platformName" name="platformName" value="DVente" placeholder="Nom de la plateforme">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="adminEmail" class="form-label">Email administrateur</label>
+                            <input type="email" class="form-control" id="adminEmail" name="adminEmail" value="admin@dvente.com" placeholder="Email administrateur">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="defaultCurrency" class="form-label">Devise par défaut</label>
+                            <select class="form-select" id="defaultCurrency" name="defaultCurrency">
+                                <option value="EUR" selected>Euro (EUR)</option>
+                                <option value="USD">Dollar US (USD)</option>
+                                <option value="GBP">Livre Sterling (GBP)</option>
+                                <option value="XOF">Franc CFA (XOF)</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i>Sauvegarder
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Paramètres de modération -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="m-0 font-weight-bold text-warning">
+                        <i class="fas fa-shield-alt me-2"></i>Paramètres de modération
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form id="moderationSettingsForm">
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="manualShopValidation" name="manualShopValidation" checked>
+                                <label class="form-check-label" for="manualShopValidation">
+                                    Validation manuelle des boutiques
+                                </label>
+                            </div>
+                            <small class="form-text text-muted">Les nouvelles boutiques nécessitent une approbation manuelle</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="manualProductValidation" name="manualProductValidation">
+                                <label class="form-check-label" for="manualProductValidation">
+                                    Validation manuelle des produits
+                                </label>
+                            </div>
+                            <small class="form-text text-muted">Les nouveaux produits nécessitent une approbation manuelle</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="emailNotifications" name="emailNotifications" checked>
+                                <label class="form-check-label" for="emailNotifications">
+                                    Notifications email aux admins
+                                </label>
+                            </div>
+                            <small class="form-text text-muted">Recevoir des notifications pour les actions importantes</small>
+                        </div>
+
+                        <button type="submit" class="btn btn-warning">
+                            <i class="fas fa-save me-1"></i>Sauvegarder
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions système -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="m-0 font-weight-bold text-danger">
+                        <i class="fas fa-tools me-2"></i>Actions système
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <div class="d-grid">
+                                <button type="button" class="btn btn-outline-info" id="clearCacheBtn">
+                                    <i class="fas fa-broom me-2"></i>
+                                    Vider le cache
+                                </button>
+                            </div>
+                            <small class="text-muted mt-1 d-block">Supprime tous les fichiers de cache temporaires</small>
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <div class="d-grid">
+                                <button type="button" class="btn btn-outline-success" id="generateReportBtn">
+                                    <i class="fas fa-chart-bar me-2"></i>
+                                    Générer rapport
+                                </button>
+                            </div>
+                            <small class="text-muted mt-1 d-block">Génère un rapport détaillé des statistiques</small>
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <div class="d-grid">
+                                <button type="button" class="btn btn-outline-warning" id="maintenanceModeBtn" data-enabled="false">
+                                    <i class="fas fa-wrench me-2"></i>
+                                    Mode maintenance
+                                </button>
+                            </div>
+                            <small class="text-muted mt-1 d-block">Active/désactive le mode maintenance</small>
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <div class="d-grid">
+                                <button type="button" class="btn btn-outline-secondary" onclick="location.reload()">
+                                    <i class="fas fa-sync-alt me-2"></i>
+                                    Actualiser page
+                                </button>
+                            </div>
+                            <small class="text-muted mt-1 d-block">Recharge la page actuelle</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript pour les actions -->
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        // Paramètres généraux
+        document.getElementById('generalSettingsForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+
+            fetch('/admin/settings/general', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showAlert('Paramètres sauvegardés avec succès', 'success');
+                    } else {
+                        showAlert('Erreur: ' + data.message, 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    showAlert('Une erreur est survenue', 'danger');
+                });
+        });
+
+        // Paramètres de modération
+        document.getElementById('moderationSettingsForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+
+            fetch('/admin/settings/moderation', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showAlert('Paramètres de modération sauvegardés', 'success');
+                    } else {
+                        showAlert('Erreur: ' + data.message, 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    showAlert('Une erreur est survenue', 'danger');
+                });
+        });
+
+        // Vider le cache
+        document.getElementById('clearCacheBtn').addEventListener('click', function() {
+            if (confirm('Voulez-vous vraiment vider le cache ?')) {
+                fetch('/admin/system/clear-cache', {
+                    method: 'POST'
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showAlert('Cache vidé avec succès', 'success');
+                        } else {
+                            showAlert('Erreur: ' + data.message, 'danger');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erreur:', error);
+                        showAlert('Une erreur est survenue', 'danger');
+                    });
+            }
+        });
+
+        // Générer rapport
+        document.getElementById('generateReportBtn').addEventListener('click', function() {
+            const btn = this;
+            const originalText = btn.innerHTML;
+
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Génération...';
+            btn.disabled = true;
+
+            fetch('/admin/system/generate-report', {
+                method: 'POST'
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showAlert('Rapport généré avec succès', 'success');
+                        if (data.downloadUrl) {
+                            window.open(data.downloadUrl, '_blank');
+                        }
+                    } else {
+                        showAlert('Erreur: ' + data.message, 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    showAlert('Une erreur est survenue', 'danger');
+                })
+                .finally(() => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                });
+        });
+
+        // Mode maintenance
+        document.getElementById('maintenanceModeBtn').addEventListener('click', function() {
+            const btn = this;
+            const currentEnabled = btn.dataset.enabled === 'true';
+            const newEnabled = !currentEnabled;
+
+            const action = newEnabled ? 'activer' : 'désactiver';
+
+            if (confirm(`Voulez-vous ${action} le mode maintenance ?`)) {
+                fetch('/admin/system/maintenance-mode', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `enabled=${newEnabled}`
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            btn.dataset.enabled = data.maintenanceMode;
+                            btn.className = data.maintenanceMode ?
+                                'btn btn-danger' : 'btn btn-outline-warning';
+                            btn.innerHTML = data.maintenanceMode ?
+                                '<i class="fas fa-times me-2"></i>Désactiver maintenance' :
+                                '<i class="fas fa-wrench me-2"></i>Mode maintenance';
+
+                            showAlert(data.message, 'success');
+                        } else {
+                            showAlert('Erreur: ' + data.message, 'danger');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erreur:', error);
+                        showAlert('Une erreur est survenue', 'danger');
+                    });
+            }
+        });
+
+        // Fonction utilitaire pour afficher les alertes
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+
+            // Insérer l'alerte au début du contenu
+            const content = document.querySelector('[th\\:fragment="content"]');
+            content.insertBefore(alertDiv, content.firstChild);
+
+            // Auto-suppression après 5 secondes
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
+            }, 5000);
+        }
+    });
+</script>
+
+</body>
+</html>

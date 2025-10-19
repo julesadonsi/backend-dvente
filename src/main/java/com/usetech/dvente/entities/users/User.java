@@ -27,6 +27,8 @@ import java.util.Collections;
 @Builder
 public class User extends BaseModel implements UserDetails {
 
+    private String baseUrl;
+
     @Column(unique = true)
     private String email;
 
@@ -89,9 +91,6 @@ public class User extends BaseModel implements UserDetails {
         return (phone != null && !phone.isEmpty()) ? phone : email;
     }
 
-    // ----------------------
-    // UserDetails methods
-    // ----------------------
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         if (role != null) {

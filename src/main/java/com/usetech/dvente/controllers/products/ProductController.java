@@ -1,6 +1,7 @@
 package com.usetech.dvente.controllers.products;
 
 import com.usetech.dvente.responses.products.PaginatedProductResponse;
+import com.usetech.dvente.responses.products.ProductDetailResponse;
 import com.usetech.dvente.services.products.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -8,6 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +26,9 @@ import java.util.UUID;
 public class ProductController {
 
     private final ProductService productService;
+
+    @Value("${server.backend.url}")
+    private String serverApiUrl;
 
     @GetMapping
     @Operation(
@@ -64,4 +69,55 @@ public class ProductController {
                     .body(errorResponse);
         }
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getProductDetail(@PathVariable UUID id) {
+        try {
+            ProductDetailResponse product = productService.getProductDetail(id, serverApiUrl);
+
+            if (product == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("detail", "Product not found."));
+            }
+            return ResponseEntity.ok(product);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Erreur serveur: " + e.getMessage()));
+        }
+    }
+
+
+
+
+    @GetMapping("/{shopUrl}")
+    @Operation(
+            summary = "Get Shop Products",
+            description = "Récupérer les produits d'une boutique par son URL"
+    )
+    public ResponseEntity<?> getShopProducts(
+            @PathVariable String shopUrl,
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(name = "page_size", defaultValue = "25") Integer pageSize,
+            @RequestParam(required = false) String name
+    ) {
+        try {
+            PaginatedProductResponse products = productService.getProductsByShopUrl(
+                    shopUrl, page, pageSize, name, serverApiUrl
+            );
+
+            if (products == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("error", "Boutique non trouvée"));
+            }
+
+            return ResponseEntity.ok(products);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Erreur serveur: " + e.getMessage()));
+        }
+    }
+
+
 }

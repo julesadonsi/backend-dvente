@@ -15,6 +15,24 @@ public class FileStorageService {
     @Value("${app.upload.path:uploads}")
     private String uploadBasePath;
 
+
+    @Value("${server.backend.url}")
+    private String apiUrl;
+
+    /**
+     * Sauvegarde une image de produit et retourne son URL.
+     */
+    public String saveProductImage(MultipartFile file) {
+        return saveFile(file, "products");
+    }
+
+    /**
+     * Supprime une image de produit.
+     */
+    public void deleteProductImage(String imageUrl) {
+        deleteFile(imageUrl);
+    }
+
     /**
      * Sauvegarde un fichier avatar et retourne son URL.
      */
