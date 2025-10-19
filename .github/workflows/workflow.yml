@@ -37,19 +37,19 @@ jobs:
           timeout: 60s
           script: |
             cd /root/dvente-api
-            
+
+            # Supprime les backups existants sauf les 5 derniers
+            ls -t app.jar.backup_* 2>/dev/null | tail -n +6 | xargs -r rm
+
             if [ -f app.jar ]; then
               echo "💾 Sauvegarde de l'ancienne version..."
               TIMESTAMP=$(date +%Y%m%d_%H%M%S)
               cp app.jar "app.jar.backup_$TIMESTAMP"
-            
-              # Garder seulement les 5 dernières sauvegardes
-              ls -t app.jar.backup_* 2>/dev/null | tail -n +6 | xargs -r rm
-            
               echo "✅ Sauvegarde créée: app.jar.backup_$TIMESTAMP"
             else
               echo "ℹ️ Aucune version précédente à sauvegarder (premier déploiement)"
             fi
+      
 
       - name: Copy JAR to VPS
         uses: appleboy/scp-action@v0.1.7
