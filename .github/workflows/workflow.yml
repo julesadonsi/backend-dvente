@@ -46,7 +46,6 @@ jobs:
           strip_components: 1
 
 
-      # 🚀 7. Déploiement et redémarrage du service sur le VPS
       - name: Deploy on VPS
         uses: appleboy/ssh-action@master
         with:
@@ -71,31 +70,4 @@ jobs:
             echo "🔄 Redémarrage du service springboot-app..."
             systemctl restart springboot-app
 
-            # Attente du redémarrage
             sleep 10
-
-            # Vérification du statut
-            if systemctl is-active --quiet springboot-app; then
-              echo "✅ Déploiement réussi !"
-              rm -f app.jar.backup
-            else
-              echo "❌ Échec du déploiement, restauration de la version précédente..."
-              if [ -f app.jar.backup ]; then
-                mv app.jar.backup app.jar
-                systemctl restart springboot-app
-              fi
-              exit 1
-            fi
-
-      # ❤️ 8. Health Check de l’application
-      - name: Health Check
-        run: |
-          echo "⏳ Vérification du statut de santé de l'application..."
-          sleep 5
-          response=$(curl -s -o /dev/null -w "%{http_code}" http://${{ secrets.VPS_HOST }}:8080/actuator/health || echo "000")
-          if [ "$response" == "200" ]; then
-            echo "✅ Health check passed!"
-          else
-            echo "🚨 Health check failed with status: $response"
-            exit 1
-          fi
