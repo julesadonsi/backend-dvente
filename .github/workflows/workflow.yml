@@ -74,12 +74,7 @@ jobs:
           script: |
             set -e
             cd /root/dvente-api
-            echo "➡️ Déploiement en cours sur le VPS..."
-            mv "$JAR_FILE" app.jar
-            echo "🔄 Redémarrage du service springboot-app..."
             systemctl restart springboot-app
-            # Attendre le démarrage
-            echo "⏳ Attente du démarrage de l'application..."
             sleep 15
             
       - name: Deployment successful
