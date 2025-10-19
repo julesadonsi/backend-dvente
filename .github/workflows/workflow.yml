@@ -11,9 +11,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 🧱 1. Récupération du code source
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # ☕ 2. Configuration de Java 17
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
@@ -21,9 +23,17 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
+      # 🧰 3. Build du projet
       - name: Build with Maven
-        run: mvn clean package -DskipTests
+        run: |
+          set -e
+          mvn clean package -DskipTests
 
+      # 🔍 4. Vérification du dossier target/
+      - name: Check build output
+        run: ls -lah target
+
+      # 📦 5. Copie du fichier .jar sur le VPS
       - name: Copy JAR to VPS
         uses: appleboy/scp-action@master
         with:
@@ -35,6 +45,7 @@ jobs:
           target: "/root/dvente-api"
           strip_components: 1
 
+      # ⚙️ 6. Copie du fichier .env sur le VPS
       - name: Copy .env file to VPS
         uses: appleboy/scp-action@master
         with:
@@ -45,6 +56,7 @@ jobs:
           source: ".env"
           target: "/root/dvente-api"
 
+      # 🚀 7. Déploiement et redémarrage du service sur le VPS
       - name: Deploy on VPS
         uses: appleboy/ssh-action@master
         with:
@@ -55,28 +67,29 @@ jobs:
           script: |
             cd /root/dvente-api
             
-            # Backup de l'ancienne version
+            echo "➡️ Déploiement en cours sur le VPS..."
+
+            # Sauvegarde de l'ancienne version si elle existe
             if [ -f app.jar ]; then
+              echo "Sauvegarde de l'ancienne version..."
               mv app.jar app.jar.backup
             fi
-            
-            # Renommer le nouveau JAR
+
+            # Renommer le nouveau jar
             mv *.jar app.jar
-            
-            # Redémarrer le service
+
+            echo "🔄 Redémarrage du service springboot-app..."
             systemctl restart springboot-app
-            
-            # Attendre que l'application démarre
+
+            # Attente du redémarrage
             sleep 10
-            
-            # Vérifier que l'application est démarrée
+
+            # Vérification du statut
             if systemctl is-active --quiet springboot-app; then
-              echo "Deployment successful!"
-              # Supprimer le backup si tout va bien
+              echo "✅ Déploiement réussi !"
               rm -f app.jar.backup
             else
-              echo "Deployment failed! Rolling back..."
-              # Restaurer l'ancienne version
+              echo "❌ Échec du déploiement, restauration de la version précédente..."
               if [ -f app.jar.backup ]; then
                 mv app.jar.backup app.jar
                 systemctl restart springboot-app
@@ -84,13 +97,15 @@ jobs:
               exit 1
             fi
 
+      # ❤️ 8. Health Check de l’application
       - name: Health Check
         run: |
+          echo "⏳ Vérification du statut de santé de l'application..."
           sleep 5
           response=$(curl -s -o /dev/null -w "%{http_code}" http://${{ secrets.VPS_HOST }}:8080/actuator/health || echo "000")
           if [ "$response" == "200" ]; then
-            echo "Health check passed!"
+            echo "✅ Health check passed!"
           else
-            echo "Health check failed with status: $response"
+            echo "🚨 Health check failed with status: $response"
             exit 1
           fi
