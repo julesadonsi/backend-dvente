@@ -45,7 +45,7 @@ jobs:
           target: "/root/dvente-api"
           strip_components: 1
 
-
+      # 🚀 6. Déploiement sur le VPS
       - name: Deploy on VPS
         uses: appleboy/ssh-action@master
         with:
@@ -55,19 +55,52 @@ jobs:
           port: ${{ secrets.VPS_PORT }}
           script: |
             cd /root/dvente-api
-            
             echo "➡️ Déploiement en cours sur le VPS..."
 
-            # Sauvegarde de l'ancienne version si elle existe
-            if [ -f app.jar ]; then
-              echo "Sauvegarde de l'ancienne version..."
-              mv app.jar app.jar.backup
-            fi
+            # Créer le dossier de backup s'il n'existe pas
+            mkdir -p backup
 
-            # Renommer le nouveau jar
-            mv *.jar app.jar
+            # Vérifier si le JAR existe avant de renommer
+            if ls *.jar 1> /dev/null 2>&1; then
+              # Sauvegarde de l'ancienne version si elle existe
+              if [ -f app.jar ]; then
+                echo "🔄 Sauvegarde de l'ancienne version..."
+                mv app.jar backup/app.jar
+              fi
+              # Renommer le nouveau JAR
+              mv *.jar app.jar
+            else
+              echo "❌ Aucun JAR trouvé à déployer"
+              exit 1
+            fi
 
             echo "🔄 Redémarrage du service springboot-app..."
             systemctl restart springboot-app
 
-            sleep 10
+            # Attendre que l'application démarre
+            sleep 15
+
+            # Vérification du statut du service
+            if systemctl is-active --quiet springboot-app; then
+              echo "✅ Service démarré avec succès !"
+            else
+              echo "❌ Déploiement échoué, restauration du backup..."
+              if [ -f backup/app.jar ]; then
+                mv backup/app.jar app.jar
+                systemctl restart springboot-app
+              fi
+              exit 1
+            fi
+
+      # 🩺 7. Health check sur l'application
+      - name: Health Check
+        run: |
+          echo "⏳ Vérification du statut de santé de l'application..."
+          sleep 5
+          response=$(curl -s -o /dev/null -w "%{http_code}" http://${{ secrets.VPS_HOST }}:8000/actuator/health || echo "000")
+          if [ "$response" == "200" ]; then
+            echo "✅ Health check passé !"
+          else
+            echo "❌ Health check échoué avec le code : $response"
+            exit 1
+          fi
