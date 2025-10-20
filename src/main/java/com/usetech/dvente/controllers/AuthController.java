@@ -106,8 +106,12 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public void logout(HttpServletResponse response) {
+    public ResponseEntity<?> logout(HttpServletResponse response) {
+
         cookieService.clearAuthCookies(response);
+        Map<String, String> body = new HashMap<>();
+        body.put("message", "You've been logged out");
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/send/otp")
