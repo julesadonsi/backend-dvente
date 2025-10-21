@@ -97,28 +97,24 @@
                 <ul class="nav flex-column">
                     <li class="nav-item">
                         <a class="nav-link"
-                           th:classappend="${#httpServletRequest.requestURI == '/admin/dashboard' || #httpServletRequest.requestURI == '/admin/' ? 'active' : ''}"
                            th:href="@{/admin/dashboard}">
                             <i class="fas fa-home me-2"></i>Tableau de bord
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link"
-                           th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/admin/users') ? 'active' : ''}"
                            th:href="@{/admin/users}">
                             <i class="fas fa-users me-2"></i>Utilisateurs
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link"
-                           th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/admin/shops') ? 'active' : ''}"
                            th:href="@{/admin/shops}">
                             <i class="fas fa-store me-2"></i>Boutiques
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link"
-                           th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/admin/settings') ? 'active' : ''}"
                            th:href="@{/admin/settings}">
                             <i class="fas fa-cog me-2"></i>Paramètres
                         </a>
