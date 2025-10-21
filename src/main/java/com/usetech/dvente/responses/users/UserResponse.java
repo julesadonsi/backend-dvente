@@ -43,6 +43,18 @@ public class UserResponse {
     private UserRole role;
     private String phone;
     private String avatar;
+    private String country;
+    private String city;
+    private boolean phone_confirmed;
+    private boolean email_confirmed;
+
+
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime date_joined;
+
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime dateUpdated;
+    private boolean isActive = true;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createdAt;
@@ -61,8 +73,14 @@ public class UserResponse {
                 .role(user.getRole())
                 .phone(user.getPhone())
                 .avatar(fullAvatarUrl)
+                .country(user.getCountry())
+                .city(user.getCity())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
+                .date_joined(user.getDateJoined())
+                .isActive(user.isActive())
+                .phone_confirmed(user.isPhoneConfirmed())
+                .email_confirmed(user.isEmailConfirmed())
                 .build();
     }
 }

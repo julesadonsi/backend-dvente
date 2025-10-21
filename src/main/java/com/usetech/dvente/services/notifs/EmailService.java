@@ -7,6 +7,7 @@ import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -97,10 +98,9 @@ public class EmailService {
      * Sends a reset code to the specified email address using a predefined email template.
      *
      * @param email the recipient's email address
-     * @param code the reset code to be sent
-     * @return true if the email is successfully sent, otherwise throws a RuntimeException
+     * @param code  the reset code to be sent
      */
-    public  boolean sendResetCode(String email, String code) {
+    public void sendResetCode(String email, String code) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
@@ -119,7 +119,6 @@ public class EmailService {
             helper.setText(htmlContent, true);
 
             mailSender.send(message);
-            return true;
 
         }catch (Exception e) {
             throw new RuntimeException(e);
@@ -144,6 +143,28 @@ public class EmailService {
             mailSender.send(message);
         } catch (Exception e) {
             throw new RuntimeException("Erreur lors de l'envoi de l'email: " + e.getMessage());
+        }
+    }
+
+    @Async
+    public void sendUpdateEmailVerificationCode(String email, String code) {
+        try {
+            String subject = "Code de verification - " + appName + "!";
+
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+            Context context = new Context();
+            context.setVariable("code", code);
+
+            String htmlContent = templateEngine.process("emails/updateEmailVerificationCode", context);
+            helper.setText(htmlContent, true);
+            helper.setFrom(fromEmail);
+            helper.setSubject(subject);
+            helper.setTo(email);
+            mailSender.send(message);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
