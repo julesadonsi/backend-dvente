@@ -18,12 +18,19 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
 
+
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        return path.startsWith("/admin");
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -66,31 +73,31 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
         } catch (io.jsonwebtoken.ExpiredJwtException e) {
-            logger.warn("Token expiré : {}");
+            logger.warn("Token expiré");
             clearAuthCookies(response);
             sendErrorResponse(response, 401, "token_expired", "Le token JWT a expiré", e.getClaims().getExpiration().toInstant().toString());
             return;
 
         } catch (io.jsonwebtoken.MalformedJwtException e) {
-            logger.warn("Token invalide : {}");
+            logger.warn("Token invalide");
             clearAuthCookies(response);
             sendErrorResponse(response, 400, "token_invalid", "Le token JWT est invalide", null);
             return;
 
         } catch (io.jsonwebtoken.UnsupportedJwtException e) {
-            logger.warn("Token non supporté : {}");
+            logger.warn("Token non supporté");
             clearAuthCookies(response);
             sendErrorResponse(response, 400, "token_unsupported", "Le token JWT n'est pas supporté", null);
             return;
 
         } catch (io.jsonwebtoken.security.SignatureException e) {
-            logger.warn("Signature invalide : {}");
+            logger.warn("Signature invalide");
             clearAuthCookies(response);
             sendErrorResponse(response, 400, "token_invalid_signature", "La signature du token JWT est invalide", null);
             return;
 
         } catch (Exception e) {
-            logger.error("Erreur authentification JWT : {}");
+            logger.error("Erreur authentification JWT : " + e.getMessage());
             clearAuthCookies(response);
             sendErrorResponse(response, 500, "internal_error", "Erreur interne lors de l'authentification JWT", null);
             return;
