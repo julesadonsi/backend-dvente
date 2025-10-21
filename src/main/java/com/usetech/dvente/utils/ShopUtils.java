@@ -1,5 +1,6 @@
 package com.usetech.dvente.utils;
 
+import java.security.SecureRandom;
 import java.text.Normalizer;
 import java.util.regex.Pattern;
 
@@ -29,5 +30,16 @@ public class ShopUtils {
             return null;
         }
         return shopUrl.startsWith("@") ? shopUrl.substring(1) : shopUrl;
+    }
+
+
+    /**
+     * Generate code to send by email
+     * @return String
+     */
+    public static String generate6DigitCode() {
+        SecureRandom random = new SecureRandom();
+        int code = 100000 + random.nextInt(900000);
+        return String.valueOf(code);
     }
 }
