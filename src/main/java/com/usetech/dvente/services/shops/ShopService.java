@@ -1,9 +1,7 @@
 package com.usetech.dvente.services.shops;
 
-import com.usetech.dvente.entities.users.Shop;
-import com.usetech.dvente.entities.users.ShopGallery;
-import com.usetech.dvente.entities.users.ShopUrlHistory;
-import com.usetech.dvente.entities.users.User;
+import com.usetech.dvente.entities.users.*;
+import com.usetech.dvente.repositories.UserRepository;
 import com.usetech.dvente.repositories.shops.ShopGalleryRepository;
 import com.usetech.dvente.repositories.shops.ShopRepository;
 import com.usetech.dvente.repositories.shops.ShopUrlHistoryRepository;
@@ -35,6 +33,7 @@ public class ShopService {
     private final ShopUrlHistoryRepository shopUrlHistoryRepository;
     private final FileStorageService fileStorageService;
     private final EmailService emailService;
+    private final UserRepository userRepository;
 
     @Value("${app.url}")
     private String apiUrl;
@@ -255,5 +254,21 @@ public class ShopService {
         return shopRepository.findByShopUrl(cleanedUrl)
                 .orElse(null);
     }
+
+
+    @Transactional
+    public void validateShop(Shop shop) {
+        User user = shop.getUser();
+        userRepository.updateUserRole(UserRole.SHOP, user.getId());
+        shopRepository.updateShopStatus(shop.getId(), ShopStatus.ACTIF);
+
+        emailService.sendShopValidatedEmail(
+                user.getEmail(),
+                user.getName(),
+                shop.getShopName(),
+                shop.getShopUrl()
+        );
+    }
+
 
 }

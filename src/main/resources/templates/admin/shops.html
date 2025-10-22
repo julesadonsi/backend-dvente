@@ -88,9 +88,10 @@
                                 <td th:text="${#temporals.format(shop.createdAt, 'dd/MM/yyyy HH:mm')}">01/01/2024 10:00</td>
                                 <td>
                                     <div class="btn-group btn-group-sm">
-                                        <a th:href="@{/admin/shops/{id}(id=${shop.id})}"
-                                           class="btn btn-outline-info" title="Voir détails">
-                                            <i class="fas fa-eye"></i>
+                                        <a th:href="@{/admin/shops/{id}/validate(id=${shop.id})}"
+                                           class="btn btn-outline-info"
+                                           title="Valider">
+                                            <i class="fas fa-check"></i>
                                         </a>
                                     </div>
                                 </td>

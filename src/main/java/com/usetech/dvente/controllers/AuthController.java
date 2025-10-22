@@ -53,7 +53,14 @@ public class AuthController {
 
 
     @PostMapping("/login")
-    public AuthResponse login(@RequestBody LoginRequest request, HttpServletResponse response) {
+    public ResponseEntity<?> login(
+            @Valid @RequestBody(required = false) LoginRequest request,
+            HttpServletResponse response) {
+
+        if (request == null) {
+            return ResponseEntity.badRequest().body(Map.of("error", "empty"));
+        }
+
         User user = userService.login(request.getEmail(), request.getPassword());
         String token = jwtService.generateAccessToken(user);
         String refresh = jwtService.generateRefreshToken(user);
@@ -61,8 +68,9 @@ public class AuthController {
         cookieService.addAccessTokenCookie(response, token);
         cookieService.addRefreshTokenCookie(response, refresh);
 
-        return new AuthResponse(token, refresh, UserResponse.fromUser(user));
+        return ResponseEntity.ok(new AuthResponse(token, refresh, UserResponse.fromUser(user)));
     }
+
 
     @PostMapping("/refresh")
     public RefreshTokenResponse refresh(
