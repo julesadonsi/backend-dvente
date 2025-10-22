@@ -7,6 +7,7 @@ import com.usetech.dvente.entities.users.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -145,4 +146,13 @@ public interface ShopRepository extends JpaRepository<Shop, UUID> {
     List<Shop> findShopsPendingVerification();
 
     boolean existsByUserId(UUID userId);
+
+    /**
+     * Met à jour le statut d'une boutique
+     * @param shopId id de la boutique
+     * @param shopStatus status de la boutique
+     */
+    @Query("UPDATE Shop s SET s.status = :shopStatus WHERE s.id = :shopId")
+    @Modifying()
+    void updateShopStatus(UUID shopId, ShopStatus shopStatus);
 }

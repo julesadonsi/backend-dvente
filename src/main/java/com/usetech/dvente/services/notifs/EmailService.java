@@ -1,8 +1,10 @@
 package com.usetech.dvente.services.notifs;
 
 
+import com.usetech.dvente.entities.users.Shop;
 import com.usetech.dvente.entities.users.User;
 import jakarta.mail.MessagingException;
+import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -14,8 +16,9 @@ import org.thymeleaf.context.Context;
 
 import java.util.Map;
 
+
 @Service
-public class EmailService {
+public class EmailService  extends AbstractEmailService {
 
     private final JavaMailSender mailSender;
     private final TemplateEngine templateEngine;
@@ -42,7 +45,7 @@ public class EmailService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-            helper.setFrom(fromEmail);
+            setDefaultFrom(helper);
             helper.setTo(user.getEmail());
             helper.setSubject("Welcome to " + appName + "!");
 
@@ -57,7 +60,7 @@ public class EmailService {
 
             mailSender.send(message);
 
-        } catch (MessagingException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -74,7 +77,7 @@ public class EmailService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-            helper.setFrom(fromEmail);
+            setDefaultFrom(helper);
             helper.setTo(email);
             helper.setSubject("Code de verification - " + appName + "!");
             Context context = new Context();
@@ -105,7 +108,7 @@ public class EmailService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-            helper.setFrom(fromEmail);
+            setDefaultFrom(helper);
             helper.setTo(email);
             helper.setSubject("Code de verification - " + appName + "!");
 
@@ -129,13 +132,13 @@ public class EmailService {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            setDefaultFrom(helper);
 
             Context context = new Context();
             context.setVariables(variables);
 
             String htmlContent = templateEngine.process(templateName, context);
 
-            helper.setFrom(fromEmail);
             helper.setTo(to);
             helper.setSubject(subject);
             helper.setText(htmlContent, true);
@@ -153,13 +156,12 @@ public class EmailService {
 
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
-
+            setDefaultFrom(helper);
             Context context = new Context();
             context.setVariable("code", code);
 
             String htmlContent = templateEngine.process("emails/updateEmailVerificationCode", context);
             helper.setText(htmlContent, true);
-            helper.setFrom(fromEmail);
             helper.setSubject(subject);
             helper.setTo(email);
             mailSender.send(message);
@@ -167,5 +169,40 @@ public class EmailService {
             throw new RuntimeException(e);
         }
     }
+
+    /**
+     * Envoie un email de validation de boutique
+     */
+    @Async
+    public void sendShopValidatedEmail(String email, String name, String shopName, String slug) {
+        try {
+            Map<String, Object> vars = Map.of(
+                    "name", name,
+                    "shopName", shopName,
+                    "dashboardUrl", appUrl + "/u/dashboard",
+                    "shopLink", appUrl + "/@" + slug,
+                    "shopUrl", appUrl + "/@" + slug
+            );
+
+            String subject = "Boutique " + shopName.toUpperCase() + " validée!";
+            MimeMessage message = mailSender.createMimeMessage();
+
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            setDefaultFrom(helper);
+
+            Context context = new Context();
+            context.setVariables(vars);
+
+            String htmlContent = templateEngine.process("emails/shopValidated", context);
+            helper.setText(htmlContent, true);
+            helper.setSubject(subject);
+            helper.setTo(email);
+            mailSender.send(message);
+
+        } catch (Exception exception) {
+            throw new RuntimeException(exception);
+        }
+    }
+
 
 }

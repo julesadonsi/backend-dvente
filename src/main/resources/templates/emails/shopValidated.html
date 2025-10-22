@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Boutique activée avec succès</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eee;
+            margin-bottom: 30px;
+        }
+        .logo {
+            max-width: 150px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #0a6ebd;
+            margin-bottom: 25px;
+            font-size: 24px;
+        }
+        .shop-name {
+            background-color: #f8f9fa;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border-left: 4px solid #0a6ebd;
+            margin: 20px 0;
+        }
+        .steps {
+            background-color: #f8f9fa;
+            padding: 20px 5px;
+            border-radius: 8px;
+            margin: 25px 0;
+        }
+        .steps li {
+            margin-bottom: 12px;
+            color: #2c3e50;
+        }
+        .button {
+            display: inline-block;
+            background-color: #0a6ebd;
+            color: white !important;
+            padding: 12px 25px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-weight: bold;
+            text-align: center;
+            transition: background-color 0.3s ease;
+        }
+        .button:hover {
+            background-color: #085a9d;
+        }
+        .warning {
+            font-size: 12px;
+            color: #666;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #eee;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+        .social-links {
+            margin-top: 20px;
+        }
+        .social-links a {
+            margin: 0 10px;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <img src="https://dev.dvente.com/logo.png" alt="dvente" class="logo" />
+        <h2>Félicitations <span th:text="${name}">Nom</span> ! 🎉</h2>
+    </div>
+
+    <div class="shop-name">
+        Votre boutique <strong th:text="${shopName}">Ma boutique</strong> a été activé avec succès.
+    </div>
+
+    <p>Vous pouvez maintenant vous connecter et accéder à votre tableau de bord pour commencer à vendre vos produits:</p>
+
+    <div class="steps">
+        <ol>
+            <li>✨ Créer des produits attractifs</li>
+            <li>🏪 Personnaliser votre boutique</li>
+            <li>🎨 Ajouter votre logo professionnel</li>
+            <li>💰 Recevoir des commandes, livrer et encaisser</li>
+        </ol>
+    </div>
+
+    <p style="color: #666;">
+        Nous vous conseillons de compléter la configuration de votre boutique dans les paramètres du tableau de bord pour inspirer plus de confiance à vos visiteurs.
+    </p>
+
+    <div style="text-align: center; margin: 30px 0;">
+        <a th:href="${dashboardUrl}" class="button">
+            Accéder au tableau de bord
+        </a>
+    </div>
+
+    <div style="text-align: center; margin: 20px 0;">
+        <a th:href="${shopLink}" class="button" style="background-color: #28a745;">
+            Voir ma boutique
+        </a>
+    </div>
+
+    <div class="warning">
+        Si les boutons ne fonctionnent pas, copiez et collez ce lien dans votre navigateur :<br>
+        <span style="color: #0a6ebd;" th:text="${dashboardUrl}">https://...</span><br>
+        <span style="color: #0a6ebd;" th:text="${shopUrl}">https://...</span>
+    </div>
+
+    <div class="footer">
+        <p>Cordialement,<br><strong>L'équipe Etopka</strong></p>
+        <div class="social-links">
+            <a href="https://facebook.com/etopka" style="color: #3b5998;">Facebook</a>
+            <a href="https://instagram.com/etopka" style="color: #e1306c;">Instagram</a>
+            <a href="https://twitter.com/etopka" style="color: #1da1f2;">Twitter</a>
+        </div>
+        <p style="font-size: 12px; color: #999; margin-top: 20px;">
+            © 2024 Etopka Marketplace. Tous droits réservés.
+        </p>
+    </div>
+</div>
+</body>
+</html>

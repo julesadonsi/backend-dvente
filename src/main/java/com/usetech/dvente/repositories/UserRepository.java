@@ -199,7 +199,15 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
 
     @Modifying
-    @Transactional
     @Query("UPDATE User u SET u.email = :email WHERE u.id = :userId")
-    int updateUserEmail(UUID userId, String email);
+    void updateUserEmail(UUID userId, String email);
+
+    /**
+     * Met à jour le rôle d'un utilisateur
+     * @param role role user
+     * @param userId id uuid for user
+     */
+    @Modifying
+    @Query("UPDATE User u SET u.role = :role where u.id = :userId")
+    void updateUserRole(UserRole role, UUID userId);
 }
