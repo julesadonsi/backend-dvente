@@ -136,7 +136,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         response.addCookie(refreshTokenCookie);
     }
 
-    private void sendErrorResponse(HttpServletResponse response, int status, String error, String message, String expiredAt) throws IOException {
+    private void sendErrorResponse(
+            HttpServletResponse response,
+            int status,
+            String error,
+            String message,
+            String expiredAt
+    )
+            throws IOException {
         response.setStatus(status);
         response.setContentType("application/json");
 

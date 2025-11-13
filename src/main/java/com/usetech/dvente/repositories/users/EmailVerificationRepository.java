@@ -14,11 +14,6 @@ public interface EmailVerificationRepository  extends JpaRepository<EmailVerific
 
     List<EmailVerification> findByEmail(String email);
     Optional<EmailVerification> findByEmailAndCode(String email, String code);
-    Optional<EmailVerification > findFirstByEmailOrderByCreatedAtDesc(String email);
 
     List<EmailVerification> findByExpiredAtBefore(LocalDateTime expiredAt);
-
-    boolean existsByEmailAndCodeAndIsUsedFalseAndExpiredAtAfter(
-            String email, String code, LocalDateTime expiredAt
-    );
 }

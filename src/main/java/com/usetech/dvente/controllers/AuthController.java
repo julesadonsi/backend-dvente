@@ -8,6 +8,7 @@ import com.usetech.dvente.repositories.UserRepository;
 import com.usetech.dvente.requests.LoginRequest;
 import com.usetech.dvente.requests.RefreshRequest;
 import com.usetech.dvente.requests.RegisterRequest;
+import com.usetech.dvente.requests.WhatsAppRequest;
 import com.usetech.dvente.requests.users.SendVerificationCodeRequest;
 import com.usetech.dvente.responses.AuthResponse;
 import com.usetech.dvente.responses.RefreshTokenResponse;
@@ -242,7 +243,5 @@ public class AuthController {
             return ResponseEntity.notFound().build();
         }
     }
-
-
 
 }
