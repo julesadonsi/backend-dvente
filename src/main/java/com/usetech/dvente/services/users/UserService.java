@@ -107,4 +107,9 @@ public class UserService {
         return userRepository.save(user);
     }
 
+
+    public User getUserByPhone(String phone) {
+        return userRepository.findByPhone(phone).orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
 }

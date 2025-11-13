@@ -6,6 +6,7 @@ import com.usetech.dvente.requests.users.VerifyOtpRequest;
 import com.usetech.dvente.responses.users.VerificationResponse;
 import com.usetech.dvente.services.notifs.OtpService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,8 +23,13 @@ public class VerificationController {
 
     @PostMapping("/send-otp")
     private ResponseEntity<VerificationResponse> sendOtp(@RequestBody SendOtpRequest request) {
-        VerificationResponse verificationResponse = otpService.sendOtp(request.getPhoneNumber());
-        return ResponseEntity.ok(verificationResponse);
+        try {
+            VerificationResponse response = otpService.sendOtp(request.getPhoneNumber());
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(new VerificationResponse(false, e.getMessage()));
+        }
     }
 
     @PostMapping("/verify-otp")

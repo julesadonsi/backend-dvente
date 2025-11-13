@@ -32,42 +32,38 @@ public class OtpService {
     private static final int MAX_ATTEMPTS = 3;
 
     public VerificationResponse sendOtp(String phoneNumber) {
-        try {
-            Optional<VerificationCode> existingCode =
-                    repository.findFirstByPhoneNumberAndVerifiedFalseOrderByIdDesc(phoneNumber);
 
-            Optional<User> user = userRepository.findByPhone(phoneNumber);
-            if (user.isPresent()) {
-                throw new IllegalArgumentException("User already has an unverified code");
-            }
+        Optional<VerificationCode> existingCode =
+                repository.findFirstByPhoneNumberAndVerifiedFalseOrderByIdDesc(phoneNumber);
 
-            if (existingCode.isPresent()) {
-                VerificationCode oldCode = existingCode.get();
-                oldCode.setVerified(true);
-                repository.save(oldCode);
-            }
-
-            // Génère un nouveau code
-            String otp = generateOtp();
-            LocalDateTime expiryTime = LocalDateTime.now().plusMinutes(expirationMinutes);
-            VerificationCode verificationCode = new VerificationCode(phoneNumber, otp, expiryTime);
-            repository.save(verificationCode);
-
-            // Envoie le SMS
-            String messageText = "Your verification code is: " + otp +
-                    ". Valid for " + expirationMinutes + " minutes.";
-
-            Message.creator(
-                    new PhoneNumber(phoneNumber),
-                    new PhoneNumber(fromPhoneNumber),
-                    messageText
-            ).create();
-
-            return new VerificationResponse(true, "OTP sent successfully");
-        } catch (Exception e) {
-            return new VerificationResponse(false, "Failed to send OTP: " + e.getMessage());
+        Optional<User> user = userRepository.findByPhone(phoneNumber);
+        if (user.isPresent()) {
+            throw new IllegalArgumentException("User already has an unverified code");
         }
+
+        if (existingCode.isPresent()) {
+            VerificationCode oldCode = existingCode.get();
+            oldCode.setVerified(true);
+            repository.save(oldCode);
+        }
+
+        String otp = generateOtp();
+        LocalDateTime expiryTime = LocalDateTime.now().plusMinutes(expirationMinutes);
+        VerificationCode verificationCode = new VerificationCode(phoneNumber, otp, expiryTime);
+        repository.save(verificationCode);
+
+        String messageText = "Your verification code is: " + otp +
+                ". Valid for " + expirationMinutes + " minutes.";
+
+        Message.creator(
+                new PhoneNumber(phoneNumber),
+                new PhoneNumber(fromPhoneNumber),
+                messageText
+        ).create();
+
+        return new VerificationResponse(true, "OTP sent successfully");
     }
+
 
     public VerificationResponse verifyOtp(String phoneNumber, String code,  String email) {
         Optional<VerificationCode> optionalCode =
