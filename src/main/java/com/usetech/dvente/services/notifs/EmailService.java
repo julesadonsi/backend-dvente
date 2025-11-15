@@ -3,9 +3,13 @@ package com.usetech.dvente.services.notifs;
 
 import com.usetech.dvente.entities.users.Shop;
 import com.usetech.dvente.entities.users.User;
+import com.usetech.dvente.services.users.UserService;
+import com.usetech.dvente.utils.MemoryCodeStorage;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -22,7 +26,6 @@ public class EmailService  extends AbstractEmailService {
 
     private final JavaMailSender mailSender;
     private final TemplateEngine templateEngine;
-
 
     @Value("${app.mail.from}")
     private String fromEmail;
@@ -201,6 +204,35 @@ public class EmailService  extends AbstractEmailService {
 
         } catch (Exception exception) {
             throw new RuntimeException(exception);
+        }
+    }
+
+
+    public void sendEmailInfoAttemptChangeEmail(User user, String code) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            Map<String, Object> vars = Map.of(
+                    "name", user.getName(),
+                    "email", user.getEmail(),
+                    "code", code,
+                    "appName", appName
+            );
+
+            String subject = "Tentative de changement de votre e-mail";
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            setDefaultFrom(helper);
+
+            Context context = new Context();
+            context.setVariables(vars);
+
+            String htmlContent = templateEngine.process("emails/infoAttemptChangeEmail", context);
+            helper.setText(htmlContent, true);
+            helper.setSubject(subject);
+            helper.setTo(user.getEmail());
+            mailSender.send(message);
+        }
+        catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 

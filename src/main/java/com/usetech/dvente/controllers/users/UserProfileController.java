@@ -131,7 +131,7 @@ public class UserProfileController {
             response.put("status", "error");
             response.put("message", "L'email est déjà utilisé");
             response.put("data", null);
-            return ResponseEntity.badRequest().body(response);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
         }
 
         String code = ShopUtils.generate6DigitCode();
